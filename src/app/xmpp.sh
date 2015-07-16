@@ -1,5 +1,7 @@
 #!/bin/sh
 
+XMPP_DEBUG_FILE="dbg.log"
+debug_file="$XMPP_DEBUG_FILE"
 _XMPP="$(dirname $0)/_xmpp.sh"
 control_mode_char="$(printf '\a')"
 
@@ -14,7 +16,6 @@ debug() {
 debug "Called with: $calledWith"
 
 # first parse env-variables
-debug_file="$XMPP_DEBUG_FILE"
 fifo_control=${XMPP_SOCKET_CTRL:-"/tmp/xmpp.$$/fifo.control"}
 fifo_reply=${XMPP_SOCKET_REPLY:-"/tmp/xmpp.$$/fifo.reply"}
 fifo_loop=${XMPP_SOCKET_LOOP:-"/tmp/xmpp.$$/fifo.loop"}
@@ -384,13 +385,18 @@ _start() {
 	local resource=$2
 	local login_pass=$3
 	local ncat=$4
-	local fifo_loop=$5 local fifo_control=$6
+	local fifo_loop=$5
+	local fifo_control=$6
 	local fifo_reply=$7
 	local output_eval=$8
 	local keep_fifos=$9
 	local calledWith=$10
 
-	debug "Starting xmpp-client with jid: $jid/$resource.  ncat is $ncat.  Fifos: loop: $fifo_loop, command: $fifo_control, reply: $fifo_reply"
+	debug "Starting xmpp-client with jid: $jid/$resource, password: $login_pass"
+	debug "ncat is $ncat"
+	debug "Fifos: loop: $fifo_loop, command: $fifo_control, reply: $fifo_reply"
+	debug "output_eval: $output_eval, keep_fifos: $keep_fifos"
+	debug "calledWith: $calledWith"
 
 	# make the fifos
 	for fifo in "$fifo_loop" "$fifo_control" "$fifo_reply"
