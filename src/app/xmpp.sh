@@ -27,7 +27,9 @@ IFS="$nl"
 jid=
 login_pass=
 resource="console"
-ncat="ncat --ssl talk.google.com 5223"
+#ncat="ncat --ssl talk.google.com 5223"
+ncat="nc 128.199.106.20 5222"
+#ncat="nc 128.199.106.20 5280"
 
 # Commands
 cmd_connect="connect"
