@@ -65,7 +65,7 @@ export XMPP_SOCKET_LOOP
 [cl:~/shell-xmpp-client] $ ./xmpp.sh --msg-count
 0
 [cl:~/shell-xmpp-client] $ ./xmpp.sh --msg c@delta64.com "hi there"
-[cl:~/shell-xmpp-client] $ ./xmpp.sh -msg-count
+[cl:~/shell-xmpp-client] $ ./xmpp.sh --msg-count
 1
 [cl:~/shell-xmpp-client] $ ./xmpp.sh --next-msg
 c@delta64.com/gmail.CEFA6325
