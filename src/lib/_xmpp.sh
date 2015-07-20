@@ -41,7 +41,8 @@ _xmpp() {
 	
 	local login_domain=${jid#*@}
 	# commands we send to the xmpp server:
-	local stream_start="<stream:stream to=\"$login_domain\" version=\"1.0\" xmlns=\"jabber:client\" xmlns:stream=\"http://etherx.jabber.org/streams\">"
+	local xml_version="<?xml version='1.0' ?>"
+	local stream_start="<stream:stream to=\"$login_domain\" xmlns=\"jabber:client\" xmlns:stream=\"http://etherx.jabber.org/streams\" version=\"1.0\">"
 	local stream_auth="<auth xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\" mechanism=\"PLAIN\">$login_pass</auth>"
 	local stream_bind="<iq id=\"bind1\" from=\"$jid\" type=\"set\"><bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"><resource>$resource</resource></bind></iq>"
 	local stream_presence='<presence/>'
@@ -132,6 +133,8 @@ _xmpp() {
 	_xmpp_split_input() {
 		local input=$1
 		local xml_name=$(expr match "$input" '[^<]*<[[:space:]]*\([a-zA-Z0-9_:]*\)')
+		debug "split input into 1 xml value and the rest"
+		debug "_xmpp_split_input: input="$input
 	
 		result_xml_name=
 		result_xml=
@@ -148,7 +151,7 @@ _xmpp() {
 		if [ ${#xml_1} -gt 0 ]
 		then
 			debug "first version succeeded"
-			debug "${#xml_1}"
+			debug "result_xml len: ${#xml_1}"
 			local xml_2=${input:${#xml_1}}
 			result_xml_name=$xml_name
 			result_xml=$xml_1
@@ -160,8 +163,10 @@ _xmpp() {
 		local xml_2=${input#*</$xml_name>}
 		if [ ${#xml_2} -ne ${#input} ]
 		then
+			debug "second version succeeded"
 			local xml_1_length=$(( ${#input} - ${#xml_2} ))
 			xml_1=${input:0:$xml_1_length}
+			debug "result_xml len: ${#xml_1}"
 			result_xml_name=$xml_name
 			result_xml=$xml_1
 			result_rest=$xml_2
@@ -293,7 +298,13 @@ _xmpp() {
 			debug "Inside process input loop (waiting for $stop_on)"
 			_xmpp_read
 			ret=$?; [ $ret -gt 2 ] && disconnect $ret
-			unprocessed_input=$unprocessed_input$result
+			debug "result $result"
+			if [ $result = "<?xml version='1.0'?>" ]; then
+				result=""
+				debug "dropped <?xml version='1.0'?>"
+			fi
+			#unprocessed_input=$unprocessed_input$result
+			unprocessed_input=$result
 			while [ ! -z "$unprocessed_input" ]
 			do
 				_xmpp_treat "$unprocessed_input" || break;
@@ -309,6 +320,7 @@ _xmpp() {
 	local ret
 	# start stream
 	debug "=== Sending stream_start ==="
+	_xmpp_p "$xml_version"
 	_xmpp_p "$stream_start"
 	_process_input "STREAM:STREAM"
 	_process_input "STREAM:FEATURES"
