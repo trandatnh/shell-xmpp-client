@@ -264,10 +264,10 @@ xmpp_control_mode() {
 	local line=""
 	local line_counter=0
 
-        autoEnterControlMode=
+    autoEnterControlMode=
 
-        # only not empty if autoEnter?
-        if [ "$in_line" = "" ]
+    # only not empty if autoEnter?
+    if [ "$in_line" = "" ]
 	then
 		debug "Opening fifo_control read/write"
 		# we have to close fifo_control before sending our reply
